@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TBS News: 6th Anniversary Fact Check Challenge</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #1a3a3a; /* Dark teal from image */
+        }
+        .game-card {
+            background-color: #f0f2f5;
+            transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+        }
+        .game-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+        .btn-tbs {
+            transition: background-color 0.2s, transform 0.2s;
+        }
+        .btn-tbs:hover {
+            transform: scale(1.05);
+        }
+        .feedback {
+            transition: opacity 0.5s;
+        }
+        .correct {
+            box-shadow: 0 0 15px 5px rgba(22, 163, 74, 0.6);
+        }
+        .incorrect {
+            box-shadow: 0 0 15px 5px rgba(220, 38, 38, 0.6);
+        }
+        .tbs-logo-s {
+            display: inline-block;
+            background-color: #ffffff;
+            color: #1a3a3a;
+            font-weight: 900;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 1.5rem;
+            line-height: 1.5rem;
+            border: 2px solid #1a3a3a;
+        }
+    </style>
+</head>
+<body class="text-white flex items-center justify-center min-h-screen p-4">
+
+    <div id="game-container" class="w-full max-w-2xl mx-auto text-center">
+
+        <!-- Start Screen -->
+        <div id="start-screen" class="space-y-6 p-8 bg-white/10 backdrop-blur-sm rounded-2xl shadow-lg">
+            <h1 class="text-4xl md:text-5xl font-black text-yellow-300">Fact Check Challenge!</h1>
+            <div class="flex justify-center items-center gap-4">
+                <span class="text-2xl font-bold">Celebrating 6 Years of</span>
+                <span class="tbs-logo-s">S</span>
+                <span class="text-2xl font-bold">TBS News</span>
+            </div>
+            <p class="text-lg text-gray-200">
+                Can you tell a real TBS headline from a fake one? Test your news literacy skills. You have 60 seconds to get the highest score.
+            </p>
+            <button id="start-button" class="btn-tbs w-full md:w-auto bg-yellow-400 hover:bg-yellow-500 text-gray-900 font-bold py-4 px-10 rounded-full text-xl shadow-lg">
+                Start the Challenge
+            </button>
+        </div>
+
+        <!-- Game Screen (Hidden by default) -->
+        <div id="game-screen" class="hidden">
+            <div class="flex justify-between items-center mb-6 p-4 bg-white/10 rounded-xl">
+                <div class="text-left">
+                    <div class="text-sm text-yellow-300">SCORE</div>
+                    <div id="score" class="text-3xl font-bold">0</div>
+                </div>
+                <div class="text-right">
+                    <div class="text-sm text-yellow-300">TIME LEFT</div>
+                    <div id="timer" class="text-3xl font-bold">60</div>
+                </div>
+            </div>
+
+            <div id="headline-card" class="game-card p-8 md:p-12 rounded-2xl mb-6 min-h-[200px] flex items-center justify-center">
+                <h2 id="headline-text" class="text-2xl md:text-3xl font-semibold text-gray-800">Loading headline...</h2>
+            </div>
+            
+            <div id="feedback-text" class="feedback text-xl h-8 mb-4 font-semibold opacity-0"></div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <button data-choice="real" class="choice-button btn-tbs bg-green-600 hover:bg-green-700 text-white font-bold py-4 px-6 rounded-lg text-lg">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 inline-block mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                    Real News
+                </button>
+                <button data-choice="fake" class="choice-button btn-tbs bg-red-600 hover:bg-red-700 text-white font-bold py-4 px-6 rounded-lg text-lg">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 inline-block mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                    Fake News
+                </button>
+            </div>
+        </div>
+
+        <!-- End Screen (Hidden by default) -->
+        <div id="end-screen" class="hidden space-y-6 p-8 bg-white/10 backdrop-blur-sm rounded-2xl shadow-lg">
+            <h2 class="text-3xl font-bold text-yellow-300">Time's Up!</h2>
+            <p class="text-xl text-gray-200">Your final score is:</p>
+            <div id="final-score" class="text-7xl font-black text-white">0</div>
+            <p class="text-lg text-gray-200">Thank you for celebrating 6 years of credible journalism with us. Keep questioning, keep reading!</p>
+            <button id="restart-button" class="btn-tbs w-full md:w-auto bg-yellow-400 hover:bg-yellow-500 text-gray-900 font-bold py-4 px-10 rounded-full text-xl shadow-lg">
+                Play Again
+            </button>
+        </div>
+    </div>
+
+    <script>
+        // --- DOM Elements ---
+        const startScreen = document.getElementById('start-screen');
+        const gameScreen = document.getElementById('game-screen');
+        const endScreen = document.getElementById('end-screen');
+        
+        const startButton = document.getElementById('start-button');
+        const restartButton = document.getElementById('restart-button');
+        const choiceButtons = document.querySelectorAll('.choice-button');
+
+        const scoreDisplay = document.getElementById('score');
+        const timerDisplay = document.getElementById('timer');
+        const headlineText = document.getElementById('headline-text');
+        const headlineCard = document.getElementById('headline-card');
+        const feedbackText = document.getElementById('feedback-text');
+        const finalScoreDisplay = document.getElementById('final-score');
+
+        // --- Game Data ---
+        // A mix of real headlines (some from the image) and plausible fake ones.
+        const headlines = [
+            { text: "Ship turnaround faster but customs delays choke Ctg port", isReal: true },
+            { text: "Scientists discover species of glowing fireflies in Lawachara Park", isReal: false },
+            { text: "Govt to buy 200 cars for election-day monitoring mission", isReal: true },
+            { text: "Dhaka Metro to introduce 'luxury sleeping cars' for overnight travel", isReal: false },
+            { text: "Malaysia prefers hiring workers of recruiting agencies: Asif Nazrul", isReal: true },
+            { text: "World's largest Ilish fish, weighing 5kg, caught in the Padma River", isReal: false },
+            { text: "US to screen for 'anti-Americanism' in immigration applications", isReal: true },
+            { text: "New satellite data reveals Hatirjheel water is clean enough to drink", isReal: false },
+            { text: "Finance Ministry forms 11-member committee to review quality review of 4 more banks", isReal: true },
+            { text: "Artificial intelligence now being used to predict traffic jams in Dhaka", isReal: false },
+            { text: "Bangladesh exports record-breaking $1 billion in software services", isReal: true },
+            { text: "Ancient Roman coins discovered during construction work in Old Dhaka", isReal: false },
+        ];
+
+        // --- Game State ---
+        let score = 0;
+        let timer = 60;
+        let timerInterval;
+        let currentHeadlineIndex = 0;
+        let shuffledHeadlines = [];
+
+        // --- Functions ---
+
+        /**
+         * Shuffles an array in place using the Fisher-Yates algorithm.
+         * @param {Array} array The array to shuffle.
+         */
+        function shuffleArray(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+        }
+
+        /**
+         * Starts the game.
+         */
+        function startGame() {
+            // Reset state
+            score = 0;
+            timer = 60;
+            scoreDisplay.textContent = score;
+            timerDisplay.textContent = timer;
+            
+            // Prepare headlines
+            shuffledHeadlines = [...headlines];
+            shuffleArray(shuffledHeadlines);
+            currentHeadlineIndex = 0;
+
+            // Switch screens
+            startScreen.classList.add('hidden');
+            endScreen.classList.add('hidden');
+            gameScreen.classList.remove('hidden');
+
+            // Start timer and display first headline
+            timerInterval = setInterval(updateTimer, 1000);
+            displayNextHeadline();
+        }
+
+        /**
+         * Updates the game timer every second.
+         */
+        function updateTimer() {
+            timer--;
+            timerDisplay.textContent = timer;
+            if (timer <= 0) {
+                endGame();
+            }
+        }
+
+        /**
+         * Displays the next headline from the shuffled list.
+         */
+        function displayNextHeadline() {
+            if (currentHeadlineIndex >= shuffledHeadlines.length) {
+                // If we run out of headlines, reshuffle and start over
+                shuffleArray(shuffledHeadlines);
+                currentHeadlineIndex = 0;
+            }
+            
+            headlineText.textContent = shuffledHeadlines[currentHeadlineIndex].text;
+            // Enable buttons for the next question
+            choiceButtons.forEach(button => button.disabled = false);
+        }
+        
+        /**
+         * Handles the user's choice.
+         * @param {Event} e The click event.
+         */
+        function handleChoice(e) {
+            const userChoice = e.currentTarget.dataset.choice;
+            const correctChoice = shuffledHeadlines[currentHeadlineIndex].isReal ? 'real' : 'fake';
+            
+            // Disable buttons immediately to prevent multiple clicks
+            choiceButtons.forEach(button => button.disabled = true);
+
+            if (userChoice === correctChoice) {
+                score++;
+                scoreDisplay.textContent = score;
+                showFeedback(true);
+            } else {
+                showFeedback(false);
+            }
+
+            currentHeadlineIndex++;
+            // Wait a moment before showing the next headline to show feedback
+            setTimeout(displayNextHeadline, 800);
+        }
+        
+        /**
+         * Shows visual feedback for correct/incorrect answers.
+         * @param {boolean} isCorrect Whether the answer was correct.
+         */
+        function showFeedback(isCorrect) {
+            headlineCard.classList.remove('correct', 'incorrect');
+            // Use a timeout to ensure the class is removed before being re-added, triggering the animation
+            setTimeout(() => {
+                if (isCorrect) {
+                    headlineCard.classList.add('correct');
+                    feedbackText.textContent = "Correct!";
+                    feedbackText.style.color = '#16a34a';
+                } else {
+                    headlineCard.classList.add('incorrect');
+                    feedbackText.textContent = "Incorrect!";
+                    feedbackText.style.color = '#dc2626';
+                }
+                feedbackText.style.opacity = 1;
+            }, 50);
+
+            // Fade out feedback
+            setTimeout(() => {
+                headlineCard.classList.remove('correct', 'incorrect');
+                feedbackText.style.opacity = 0;
+            }, 800);
+        }
+
+        /**
+         * Ends the game and shows the final score.
+         */
+        function endGame() {
+            clearInterval(timerInterval);
+            gameScreen.classList.add('hidden');
+            endScreen.classList.remove('hidden');
+            finalScoreDisplay.textContent = score;
+        }
+
+        // --- Event Listeners ---
+        startButton.addEventListener('click', startGame);
+        restartButton.addEventListener('click', startGame);
+        choiceButtons.forEach(button => button.addEventListener('click', handleChoice));
+
+    </script>
+</body>
+</html>
